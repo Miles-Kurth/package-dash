@@ -57,22 +57,28 @@ def printList():
     for i in range(len(positionSumList)):
         print(positionSumList[i])
 
-def addMoveToList(distX, distY):
-    positionSumList.append([distX, distY])
+# def addMoveToList(distX, distY):
+#     positionSumList.append([distX, distY])
 
-@singledispatch
-def process_data(data):
-    """The default fallback implementation."""
-    raise NotImplementedError("Unsupported type")
+def addMoveToList(*args):
+    # Case 1: A single array/list was passed
+    if len(args) == 1 and isinstance(args[0], (list, tuple)):
+        data = args[0]
+        print(f"Received an array of length {len(data)}: {data}")
+        
+    # Case 2: Two individual integers were passed
+    elif len(args) == 2 and all(isinstance(x, int) for x in args):
+        int1, int2 = args
+        print(f"Received two integers: {int1} and {int2}")
+        
+    else:
+        raise ValueError("Function expects either a single list or two integers.")
 
-@process_data.register(int)
-def _(data):
-    print(f"Processing an integer: {data * 2}")
+def turnToPoint():
+    pass
 
-@process_data.register(str)
-def _(data):
-    print(f"Processing a string: {data.upper()}")
-
+def moveToPoint():
+    pass
 
 
 # Code below
