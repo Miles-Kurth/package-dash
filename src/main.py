@@ -156,7 +156,7 @@ driveTrain.set_drive_velocity(25, PERCENT)
 moveToPoint([60, 12])
 printPosition()
 moveToPoint([30, 12])
-printPosition
+printPosition()
 moveToPoint([60,84])
 moveToPoint([125, 125])
 printPosition()
