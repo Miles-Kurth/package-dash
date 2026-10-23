@@ -64,8 +64,8 @@ def getRandomSign():
 # Prints positionList
 def printPositionList():
     global positionList, xPos, yPos
-    for i in range(len(positionList)):
-        print(positionList[i])
+    for coordPair in positionList:
+        print(coordPair)
 
 # Prints the robot's current position to the console
 def printPosition():
@@ -75,9 +75,9 @@ def printPosition():
 # Updates xPos and yPos to match the most recent move in positionList
 def updatePosition():
     global positionList, xPos, yPos
-    for i in range(len(positionList)):
-        xPos += positionList[i][0]
-        yPos += positionList[i][1]
+    for newX, newY in positionList:
+        xPos += newX
+        yPos += newY
 
 # Adds [x, y] to the position list
 def addMoveToList(coords):
