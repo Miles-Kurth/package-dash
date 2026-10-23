@@ -12,7 +12,6 @@ import random
 
 import urandom
 from vex import *
-# from functools import singledispatch
 import time
 
 # Declare brain
@@ -37,13 +36,16 @@ xPos = 0
 yPos = 0
 heading = 0
 
-positionSumList = []
+positionList = [] #list of all points the robot has traveled to
 
 
 # Functions
 
+#//---------------<</ MILES COORDINATE START />>---------------//
+#                       // DO NOT TOUCH //
+
+# Sets the seed for random events
 def initializeRandomSeed():
-    wait(100, MSEC)
     seed_val = (
         brain.battery.voltage(MV) 
         + brain.battery.current(CurrentUnits.AMP) * 100
@@ -51,39 +53,40 @@ def initializeRandomSeed():
     )
     seed_val = seed_val**3
     urandom.seed(int(seed_val))
-    temp = urandom.random() * seed_val
+    temp = pow(urandom.random(), seed_val)
     urandom.seed(int(temp))
-    print("Random seed: "+str(int(temp)))
+    # print("Random seed: "+str(int(temp)))
 
+# Picks randomly either 1 or -1
 def getRandomSign():
     return urandom.randint(0, 1) * 2 - 1
 
+# Prints positionList
 def printPositionList():
-    global positionSumList, xPos, yPos
-    for i in range(len(positionSumList)):
-        print(positionSumList[i])
+    global positionList, xPos, yPos
+    for i in range(len(positionList)):
+        print(positionList[i])
 
+# Prints the robot's current position to the console
 def printPosition():
-    global positionSumList, xPos, yPos
-    print("Current Position: ["+str(xPos)+", "+str(yPos)+"]")
+    global positionList, xPos, yPos
+    print("Current Position: ["+str(xPos)+", "+str(yPos)+"]") # example: "Current Position: [-36, -60]"
 
-def combineCoords(x, y):
-    global positionSumList, xPos, yPos
-    return [x, y]
-
+# Updates xPos and yPos to match the most recent move in positionList
 def updatePosition():
-    global positionSumList, xPos, yPos
-    for i in range(len(positionSumList)):
-        xPos += positionSumList[i][0]
-        yPos += positionSumList[i][1]
+    global positionList, xPos, yPos
+    for i in range(len(positionList)):
+        xPos += positionList[i][0]
+        yPos += positionList[i][1]
 
-# can take a single parameter [x,y]
+# Adds [x, y] to the position list
 def addMoveToList(coords):
-    global positionSumList, xPos, yPos
-    positionSumList.append(coords)
+    global positionList, xPos, yPos
+    positionList.append(coords)
 
+# Turns the robot to face [x, y]
 def turnToPoint(newCoords):
-    global positionSumList, xPos, yPos
+    global positionList, xPos, yPos
     print("Turning to point")
     x = newCoords[0]
     y = newCoords[1]
@@ -102,10 +105,10 @@ def turnToPoint(newCoords):
     wait(100)
     print("Current angle after turn: "+str(gyro.heading()))
 
+# Moves the robot to [x, y]
 def moveToPoint(newCoords):
-    global positionSumList, xPos, yPos
+    global positionList, xPos, yPos
     print("//Moving to point: ["+str(newCoords[0])+", "+str(newCoords[1])+"]//")
-
     driveTrain.set_turn_velocity(20, PERCENT)
     driveTrain.set_turn_threshold(0.5)
     turnToPoint([newCoords[0], newCoords[1]])
@@ -113,10 +116,9 @@ def moveToPoint(newCoords):
     driveTrain.set_turn_velocity(0.1, PERCENT)
     driveTrain.set_turn_threshold(0.1)
     turnToPoint([newCoords[0], newCoords[1]])
-
     wait(100)
     addMoveToList(newCoords)
-    x = newCoords[0]
+    x = newCoords[0] #start math
     y = newCoords[1]
     dx = x - xPos
     dy = y - yPos
@@ -125,74 +127,32 @@ def moveToPoint(newCoords):
     updatePosition()
     wait(100)
     print("Current angle after move: "+str(gyro.heading()))
+    initializeRandomSeed()
 
-def getHeading(newCoords):
-    global positionSumList, xPos, yPos
-    x = newCoords[0]
-    y = newCoords[1]
-    dx = x - xPos
-    dy = y - yPos
-    if (dx > 0):
-        quadrant = 4
-        if (dy > 0):
-            quadrant = 1
-    elif (dx < 0):
-        quadrant = 2
-        if (dy < 0):
-            quadrant = 3
-    math.atan2(dy, dx)
-
-# to do
+# Returns the coordinates [x, y] of an object when given a heading and distance
 def getCoordsFromHeading(heading, distance):
-    global positionSumList, xPos, yPos
+    global positionList, xPos, yPos
     x = distance * math.cos(math.radians(heading))
     y = distance * math.sin(math.radians(heading))
     return [x, y]
 
+#//--------------->>/ MILES COORDINATE END /<<---------------//
 
 
 # Code below
 
-brain.screen.print("Hello V5")
+brain.screen.print("Dashing the package")
 print("")
+
+initializeRandomSeed()
 
 gyro.calibrate()
 while gyro.is_calibrating():
     wait(50)
 
 driveTrain.set_drive_velocity(25, PERCENT)
-driveTrain.set_turn_velocity(10, PERCENT)
-driveTrain.set_turn_threshold(0.5)
 
 
-# addMoveToList([1,3])
-# addMoveToList([5,8])
-# addMoveToList([2,6])
-# addMoveToList(combineCoords(4, 7))
-# updatePosition()
-# #should be [12, 24]
-
-# printPositionList()
-
-# printPosition()
-
-
-
-
-
-initializeRandomSeed()
-
-
-
-h = urandom.randint(0, 36) * getRandomSign()
-k = urandom.randint(0, 36) * getRandomSign()
-
-# print("Random point: ["+str(h)+", "+str(k)+"]")
-
-
-# moveToPoint([h, k])
-
-# printPosition()
 
 moveToPoint([-60, -24])
 printPosition()
@@ -202,6 +162,6 @@ printPosition()
 
 
 
-
+print("END OF CODE")
 time.sleep(5)
 print("PROGRAM ENDING")
