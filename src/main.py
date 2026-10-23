@@ -32,9 +32,9 @@ driveTrain = SmartDrive(leftMotor,rightMotor,gyro,319.19, 295, 40, MM, 1)
 
 # Declare variables
 
-xPos = 0
-yPos = 0
-heading = 0
+xPos = 8
+yPos = 6
+# heading = 0
 
 positionList = [] #list of all points the robot has traveled to
 
@@ -75,9 +75,8 @@ def printPosition():
 # Updates xPos and yPos to match the most recent move in positionList
 def updatePosition():
     global positionList, xPos, yPos
-    for newX, newY in positionList:
-        xPos += newX
-        yPos += newY
+    xPos = positionList[len(positionList) - 1][0]
+    yPos = positionList[len(positionList) - 1][1]
 
 # Adds [x, y] to the position list
 def addMoveToList(coords):
@@ -154,9 +153,12 @@ driveTrain.set_drive_velocity(25, PERCENT)
 
 
 
-moveToPoint([-60, -24])
+moveToPoint([60, 12])
 printPosition()
-moveToPoint([-96, -72])
+moveToPoint([30, 12])
+printPosition
+moveToPoint([60,84])
+moveToPoint([125, 125])
 printPosition()
 
 
