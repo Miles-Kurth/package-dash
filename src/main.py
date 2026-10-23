@@ -20,9 +20,15 @@ brain = Brain()
 # Declare motors
 leftMotor = Motor(Ports.PORT10, GearSetting.RATIO_18_1, False)
 rightMotor = Motor(Ports.PORT1, GearSetting.RATIO_18_1, True)
-armMotor = Motor(Ports.PORT8)
-clawMotor = Motor(Ports.PORT3)
+armMotor = Motor(Ports.PORT8,  GearSetting.RATIO_36_1, False)
+clawMotor = Motor(Ports.PORT3 , GearSetting.RATIO_36_1, False)
 
+armMotor.set_position(0,DEGREES)
+armMotor.spin_for(FORWARD,260,DEGREES)
+
+clawMotor.set_stopping(HOLD)
+
+armMotor.set_stopping(HOLD)
 # Declare sensors
 gyro = Inertial(Ports.PORT11)
 
@@ -160,7 +166,6 @@ printPosition
 moveToPoint([60,84])
 moveToPoint([125, 125])
 printPosition()
-
 
 
 
