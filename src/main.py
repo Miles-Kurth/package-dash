@@ -28,7 +28,7 @@ armMotor.set_stopping(HOLD)
 
 # AI Vision color descriptions
 camera_BluePipe = Colordesc(1, 11, 54, 134, 10, 0.2)
-camera_RedPipe = Colordesc(3, 166, 26, 28, 10, 0.77)
+camera_RedPipe = Colordesc(3, 166, 26, 28, 30, 0.77)
 
 # Declare sensors
 gyro = Inertial(Ports.PORT11)
@@ -40,9 +40,9 @@ driveTrain = SmartDrive(leftMotor,rightMotor,gyro,319.19, 295, 40, MM, 1)
 
 # Declare variables
 
-xPos = 8
-yPos = 6
-# heading = 0
+xPos = -8
+yPos = -6
+targetDistance = 0
 
 positionList = [] #list of all points the robot has traveled to
 
@@ -94,7 +94,7 @@ def addMoveToList(coords):
 # Turns the robot to face [x, y]
 def turnToPoint(newCoords):
     global positionList, xPos, yPos
-    print("Turning to point")
+    # print("Turning to point")
     x = newCoords[0]
     y = newCoords[1]
     dx = x - xPos
@@ -102,20 +102,15 @@ def turnToPoint(newCoords):
     heading = math.atan2(dy, dx)
     heading = math.degrees(-heading)
     if heading < 0: heading = 360 + heading
-    print("Target angle: "+str(heading))
-    # if heading > 180: heading += 0.8
-    # if heading < 180: heading -= 0.8
-    # heading += 2
-    # print("Target angle: "+str(heading if heading >= 0 else 360 + heading))
-    # print("Current angle: "+str(gyro.heading()))
+    # print("Target angle: "+str(heading))
     driveTrain.turn_to_heading(heading)
     wait(100)
-    print("Current angle after turn: "+str(gyro.heading()))
+    # print("Current angle after turn: "+str(gyro.heading()))
 
 # Moves the robot to [x, y]
 def moveToPoint(newCoords):
     global positionList, xPos, yPos
-    print("//Moving to point: ["+str(newCoords[0])+", "+str(newCoords[1])+"]//")
+    # print("//Moving to point: ["+str(newCoords[0])+", "+str(newCoords[1])+"]//")
     driveTrain.set_turn_velocity(20, PERCENT)
     driveTrain.set_turn_threshold(0.5)
     turnToPoint([newCoords[0], newCoords[1]])
@@ -133,45 +128,67 @@ def moveToPoint(newCoords):
     driveTrain.drive_for(FORWARD, distance, INCHES)
     updatePosition()
     wait(100)
-    print("Current angle after move: "+str(gyro.heading()))
+    # print("Current angle after move: "+str(gyro.heading()))
     initializeRandomSeed()
 
 # Returns the coordinates [x, y] of an object when given a heading and distance
 def getCoordsFromHeading(heading, distance):
     global positionList, xPos, yPos
-    x = distance * math.cos(math.radians(heading))
-    y = distance * math.sin(math.radians(heading))
+    x = xPos + ( distance * math.cos(math.radians(heading)) )
+    y = yPos + ( distance * math.sin(math.radians(heading)) )
     return [x, y]
 
+# Returns the coordinates [x, y] of the pipe based on camera data
 def getPipeCoords():
-    global positionList, xPos, yPos
-    heading = gyro.heading()
-    camPosX = math.cos(math.radians(gyro.heading())) * 7.5
-    camPosY = math.sin(math.radians(gyro.heading())) * 7.5
+    global positionList, xPos, yPos, targetDistance
+    heading = gyro.heading() - 1
+    camPosX = xPos + math.cos(math.radians(heading)) * 7.5
+    camPosY = yPos + math.sin(math.radians(heading)) * 7.5
 
-    distanceConstant = 14.1732  #1.1811*12
+    distanceConstant = 9144  #30*304.8
 
     camera.take_snapshot(camera_RedPipe)
     obj = camera.largest_object()
     objX = obj.centerX
-    objY = obj.centerY
     objWidth = obj.width
-    objDist = distanceConstant / objWidth
 
+    objDist = (distanceConstant / objWidth) / 25.4
+    targetDistance = objDist
     hOffset = objX - 160
+    angle = hOffset * (70 / 320)
     print("hOffset: "+str(hOffset))
-    
-    # return coords
+    print("objDist: "+str(objDist))
+    print("angle: "+str(angle))
+    targetX = camPosX + math.cos(math.radians(angle)) * objDist
+    targetY = camPosY + math.sin(math.radians(angle)) * objDist
+
+    return [targetX, targetY]
+
+# Returns the distance to the pipe, in inches
+def getPipeDistance():
+    global positionList, xPos, yPos, targetDistance
+    heading = gyro.heading() - 1
+
+    distanceConstant = 9144  #30*304.8
+
+    camera.take_snapshot(camera_RedPipe)
+    obj = camera.largest_object()
+    objWidth = obj.width
+
+    objDist = (distanceConstant / objWidth) / 25.4
+
+    return objDist
 
 #//--------------->>/ MILES COORDINATE END /<<---------------//
 
 
 # Code below
 
+initializeRandomSeed()
+
 brain.screen.print("Dashing the package")
 print("")
 
-initializeRandomSeed()
 
 gyro.calibrate()
 while gyro.is_calibrating():
@@ -181,11 +198,15 @@ driveTrain.set_drive_velocity(25, PERCENT)
 
 
 armMotor.set_position(0,DEGREES)
-armMotor.spin_for(FORWARD,210,DEGREES)
+armMotor.spin_for(FORWARD,230,DEGREES)
 
-getPipeCoords()
+# getPipeCoords()
 
-# moveToPoint([60, 12])
+
+moveToPoint([-50, -12])
+turnToPoint(getPipeCoords())
+print("Pipe coords: "+str(getCoordsFromHeading(gyro.heading(), targetDistance - 2)))
+
 # printPosition()
 # moveToPoint([30, 12])
 # printPosition()
