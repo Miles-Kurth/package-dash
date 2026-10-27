@@ -23,14 +23,16 @@ rightMotor = Motor(Ports.PORT1, GearSetting.RATIO_18_1, True)
 armMotor = Motor(Ports.PORT8,  GearSetting.RATIO_36_1, False)
 clawMotor = Motor(Ports.PORT3 , GearSetting.RATIO_36_1, False)
 
-armMotor.set_position(0,DEGREES)
-armMotor.spin_for(FORWARD,260,DEGREES)
-
 clawMotor.set_stopping(HOLD)
-
 armMotor.set_stopping(HOLD)
+
+# AI Vision color descriptions
+camera_BluePipe = Colordesc(1, 11, 54, 134, 10, 0.2)
+camera_RedPipe = Colordesc(3, 166, 26, 28, 10, 0.77)
+
 # Declare sensors
 gyro = Inertial(Ports.PORT11)
+camera = AiVision(Ports.PORT15, camera_RedPipe)
 
 # Declare drivetrain
 driveTrain = SmartDrive(leftMotor,rightMotor,gyro,319.19, 295, 40, MM, 1)
@@ -141,6 +143,26 @@ def getCoordsFromHeading(heading, distance):
     y = distance * math.sin(math.radians(heading))
     return [x, y]
 
+def getPipeCoords():
+    global positionList, xPos, yPos
+    heading = gyro.heading()
+    camPosX = math.cos(math.radians(gyro.heading())) * 7.5
+    camPosY = math.sin(math.radians(gyro.heading())) * 7.5
+
+    distanceConstant = 14.1732  #1.1811*12
+
+    camera.take_snapshot(camera_RedPipe)
+    obj = camera.largest_object()
+    objX = obj.centerX
+    objY = obj.centerY
+    objWidth = obj.width
+    objDist = distanceConstant / objWidth
+
+    hOffset = objX - 160
+    print("hOffset: "+str(hOffset))
+    
+    # return coords
+
 #//--------------->>/ MILES COORDINATE END /<<---------------//
 
 
@@ -158,14 +180,18 @@ while gyro.is_calibrating():
 driveTrain.set_drive_velocity(25, PERCENT)
 
 
+armMotor.set_position(0,DEGREES)
+armMotor.spin_for(FORWARD,210,DEGREES)
 
-moveToPoint([60, 12])
-printPosition()
-moveToPoint([30, 12])
-printPosition()
-moveToPoint([60,84])
-moveToPoint([125, 125])
-printPosition()
+getPipeCoords()
+
+# moveToPoint([60, 12])
+# printPosition()
+# moveToPoint([30, 12])
+# printPosition()
+# moveToPoint([60,84])
+# moveToPoint([125, 125])
+# printPosition()
 
 
 
