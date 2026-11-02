@@ -28,7 +28,7 @@ armMotor.set_stopping(HOLD)
 
 # AI Vision color descriptions
 camera_BluePipe = Colordesc(1, 11, 54, 134, 10, 0.2)
-camera_RedPipe = Colordesc(3, 166, 26, 28, 30, 0.77)
+camera_RedPipe = Colordesc(3, 185, 20, 11, 10, 0.25)
 
 # Declare sensors
 gyro = Inertial(Ports.PORT11)
@@ -40,9 +40,11 @@ driveTrain = SmartDrive(leftMotor,rightMotor,gyro,319.19, 295, 40, MM, 1)
 
 # Declare variables
 
-xPos = -8
-yPos = -6
+xPos = 8
+yPos = 6
 targetDistance = 0
+
+distanceConstant = 375
 
 positionList = [] #list of all points the robot has traveled to
 
@@ -138,44 +140,51 @@ def getCoordsFromHeading(heading, distance):
     y = yPos + ( distance * math.sin(math.radians(heading)) )
     return [x, y]
 
-# Returns the coordinates [x, y] of the pipe based on camera data
-def getPipeCoords():
-    global positionList, xPos, yPos, targetDistance
-    heading = gyro.heading() - 1
-    camPosX = xPos + math.cos(math.radians(heading)) * 7.5
-    camPosY = yPos + math.sin(math.radians(heading)) * 7.5
+# Goes to the pipe and picks it up
+def pickUpPipe():
+    global positionList, xPos, yPos, targetDistance, distanceConstant
 
-    distanceConstant = 9144  #30*304.8
+    driveTrain.turn_to_heading(gyro.heading() + getPipeAngle()*0.7)
+    driveTrain.drive_for(FORWARD, getPipeDistance() - 1, INCHES)
+    addMoveToList( getCoordsFromHeading(gyro.heading(), getPipeDistance() - 1) )
 
-    camera.take_snapshot(camera_RedPipe)
-    obj = camera.largest_object()
-    objX = obj.centerX
-    objWidth = obj.width
+    clawMotor.spin_for(REVERSE, 1, SECONDS)
+    armMotor.spin_for(FORWARD, 40, DEGREES)
 
-    objDist = (distanceConstant / objWidth) / 25.4
-    targetDistance = objDist
-    hOffset = objX - 160
-    angle = hOffset * (70 / 320)
+# Returns the angle to the pipe, in degrees
+def getPipeAngle():
+    global positionList, xPos, yPos, targetDistance, distanceConstant
+
+    canWidthSum = 0
+    for i in range(30):
+        camera.take_snapshot(camera_RedPipe)
+        obj = camera.largest_object()
+        objWidth = obj.width
+        canWidthSum += objWidth
+    objWidth = canWidthSum / 30
+
+    hOffset = obj.centerX - 160
+    angle = hOffset * (74 / 320)
     print("hOffset: "+str(hOffset))
-    print("objDist: "+str(objDist))
     print("angle: "+str(angle))
-    targetX = camPosX + math.cos(math.radians(angle)) * objDist
-    targetY = camPosY + math.sin(math.radians(angle)) * objDist
 
-    return [targetX, targetY]
+    return angle
 
 # Returns the distance to the pipe, in inches
 def getPipeDistance():
-    global positionList, xPos, yPos, targetDistance
-    heading = gyro.heading() - 1
+    global positionList, xPos, yPos, targetDistance, distanceConstant
 
-    distanceConstant = 9144  #30*304.8
+    canWidthSum = 0
+    for i in range(30):
+        camera.take_snapshot(camera_RedPipe)
+        obj = camera.largest_object()
+        objWidth = obj.width
+        canWidthSum += objWidth
+    objWidth = canWidthSum / 30
 
-    camera.take_snapshot(camera_RedPipe)
-    obj = camera.largest_object()
-    objWidth = obj.width
 
-    objDist = (distanceConstant / objWidth) / 25.4
+    objDist = (distanceConstant / objWidth)
+    print( "Distance: "+str(objDist) )
 
     return objDist
 
@@ -199,20 +208,19 @@ driveTrain.set_drive_velocity(25, PERCENT)
 
 armMotor.set_position(0,DEGREES)
 armMotor.spin_for(FORWARD,230,DEGREES)
+clawMotor.spin_for(FORWARD, 2, SECONDS)
 
 # getPipeCoords()
 
 
-moveToPoint([-50, -12])
-turnToPoint(getPipeCoords())
-print("Pipe coords: "+str(getCoordsFromHeading(gyro.heading(), targetDistance - 2)))
+# moveToPoint([50, 12])
+# turnToPoint(getPipeCoords())
+# print("Pipe coords: "+str(getCoordsFromHeading(gyro.heading(), targetDistance - 2)))
 
-# printPosition()
-# moveToPoint([30, 12])
-# printPosition()
-# moveToPoint([60,84])
-# moveToPoint([125, 125])
-# printPosition()
+# getPipeAngle()
+# print( "Distance: "+str(getPipeDistance()) )
+
+pickUpPipe()
 
 
 
