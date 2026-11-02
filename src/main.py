@@ -185,6 +185,7 @@ def getPipeDistance():
 
 
     objDist = (distanceConstant / objWidth)
+    print("objWidth: "+str(objWidth))
     print( "Distance: "+str(objDist) )
 
     return objDist
@@ -215,13 +216,13 @@ clawMotor.spin_for(FORWARD, 2, SECONDS)
 
 
 
-moveToPoint([60, 12])
+moveToPoint([50, 12])
 pickUpPipe()
 # printPosition()
-# moveToPoint([30, 12])
+moveToPoint([30, 12])
 # printPosition()
-# moveToPoint([60,84])
-# moveToPoint([125, 125])
+moveToPoint([60,84])
+moveToPoint([125, 125])
 # printPosition()
 
 
