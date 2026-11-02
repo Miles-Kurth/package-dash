@@ -211,17 +211,18 @@ armMotor.set_position(0,DEGREES)
 armMotor.spin_for(FORWARD,230,DEGREES)
 clawMotor.spin_for(FORWARD, 2, SECONDS)
 
-# getPipeCoords()
 
 
-# moveToPoint([50, 12])
-# turnToPoint(getPipeCoords())
-# print("Pipe coords: "+str(getCoordsFromHeading(gyro.heading(), targetDistance - 2)))
 
-# getPipeAngle()
-# print( "Distance: "+str(getPipeDistance()) )
 
+moveToPoint([60, 12])
 pickUpPipe()
+# printPosition()
+# moveToPoint([30, 12])
+# printPosition()
+# moveToPoint([60,84])
+# moveToPoint([125, 125])
+# printPosition()
 
 
 
