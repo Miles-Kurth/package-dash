@@ -147,6 +147,7 @@ def pickUpPipe():
     driveTrain.turn_to_heading(gyro.heading() + getPipeAngle()*0.7)
     driveTrain.drive_for(FORWARD, getPipeDistance() - 1, INCHES)
     addMoveToList( getCoordsFromHeading(gyro.heading(), getPipeDistance() - 1) )
+    updatePosition()
 
     clawMotor.spin_for(REVERSE, 1, SECONDS)
     armMotor.spin_for(FORWARD, 40, DEGREES)
