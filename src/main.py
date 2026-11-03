@@ -51,6 +51,46 @@ positionList = [] #list of all points the robot has traveled to
 
 # Functions
 
+# Prints a funny message to the brain screen
+def printFunnyMessage():
+    wordList = ["Dash", "Pack"]
+    suffixList = ["age", "ing", ""]
+    determinerList = ["the", "a", "this", "that"]
+    wordOrderList = ["1D2", "D12", "12D"]
+
+    word1 = wordList[int(urandom.random() * 2)]
+    word2 = wordList[int(urandom.random() * 2)].lower()
+
+    if (word1 == "Dash"): #prevent "dashage" in word 1
+        suffix1 = suffixList[int(urandom.random() * 2) + 1]
+    else:
+        suffix1 = suffixList[int(urandom.random() * 3)]
+    
+    if (word2 == "Dash"): #prevent "dashage" in word 2
+        suffix2 = suffixList[int(urandom.random() * 2) + 1]
+    else:
+        suffix2 = suffixList[int(urandom.random() * 3)]
+
+    det = determinerList[int(urandom.random() * 4)]
+
+    if (det == "this" or det == "that"): #only allow pattern 3 if det is this or that
+        wordOrder = wordOrderList[int(urandom.random() * 2)]
+    else:
+        wordOrder = wordOrderList[int(urandom.random() * 3)]
+    
+    brain.screen.print(str(word1) + str(suffix1) + " the " + str(word2) + str(suffix2))
+    print("")
+
+# All setup code goes here
+def setup():
+    gyro.calibrate()
+    driveTrain.set_drive_velocity(25, PERCENT)
+    armMotor.set_position(0,DEGREES)
+    armMotor.spin_for(FORWARD,230,DEGREES) #"neutral" height, from floor
+    clawMotor.spin_for(FORWARD, 2, SECONDS) #full open
+    while gyro.is_calibrating():
+        wait(50)
+
 #//---------------<</ MILES COORDINATE START />>---------------//
 #                       // DO NOT TOUCH //
 
@@ -63,7 +103,7 @@ def initializeRandomSeed():
     )
     seed_val = seed_val**3
     urandom.seed(int(seed_val))
-    temp = pow(urandom.random(), seed_val)
+    temp = pow(urandom.random() + 1, seed_val)
     urandom.seed(int(temp))
     # print("Random seed: "+str(int(temp)))
 
@@ -116,11 +156,12 @@ def moveToPoint(newCoords):
     driveTrain.set_turn_velocity(20, PERCENT)
     driveTrain.set_turn_threshold(0.5)
     turnToPoint([newCoords[0], newCoords[1]])
-    wait(100)
     driveTrain.set_turn_velocity(0.1, PERCENT)
     driveTrain.set_turn_threshold(0.1)
     turnToPoint([newCoords[0], newCoords[1]])
-    wait(100)
+    driveTrain.set_turn_velocity(5, PERCENT)
+    driveTrain.set_turn_threshold(0.5)
+
     addMoveToList(newCoords)
     x = newCoords[0] #start math
     y = newCoords[1]
@@ -183,55 +224,54 @@ def getPipeDistance():
         canWidthSum += objWidth
     objWidth = canWidthSum / 30
 
-
     objDist = (distanceConstant / objWidth)
     print("objWidth: "+str(objWidth))
     print( "Distance: "+str(objDist) )
 
     return objDist
 
+# Drops the pipe in place and returns arm to neutral position
 def dropPipe():
     clawMotor.spin_for(FORWARD, 1, SECONDS)
     armMotor.spin_for(REVERSE, 40, DEGREES)
     
-    
 
 #//--------------->>/ MILES COORDINATE END /<<---------------//
+
 
 
 # Code below
 
 initializeRandomSeed()
 
-brain.screen.print("Dashing the package")
-print("")
+printFunnyMessage()
 
-
-gyro.calibrate()
-while gyro.is_calibrating():
-    wait(50)
-
-driveTrain.set_drive_velocity(25, PERCENT)
-
-
-armMotor.set_position(0,DEGREES)
-armMotor.spin_for(FORWARD,230,DEGREES)
-clawMotor.spin_for(FORWARD, 2, SECONDS)
-
-
+setup() #ALL SETUP CODE GOES HERE
 
 
 
 moveToPoint([50, 12])
 pickUpPipe()
-# printPosition()
-moveToPoint([30, 12])
-# printPosition()
-moveToPoint([60,84])
-moveToPoint([125, 125])
-# printPosition()
+
+moveToPoint([40, 12])
+
+moveToPoint([72,120])
+
+moveToPoint([110, 126]) #WIP (may need to move forward)
+turnToPoint([132, 126])
+dropPipe()
 
 
+moveToPoint([58, 132])
+turnToPoint([36, 132])
+pickUpPipe()
+
+moveToPoint([110, 126]) #WIP (may need to move forward)
+turnToPoint([110, 126])
+dropPipe()
+
+
+#.  moveToPoint([, ])
 
 print("END OF CODE")
 time.sleep(5)
