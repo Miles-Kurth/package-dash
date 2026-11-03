@@ -190,6 +190,12 @@ def getPipeDistance():
 
     return objDist
 
+def dropPipe():
+    clawMotor.spin_for(FORWARD, 1, SECONDS)
+    armMotor.spin_for(REVERSE, 40, DEGREES)
+    
+    
+
 #//--------------->>/ MILES COORDINATE END /<<---------------//
 
 
