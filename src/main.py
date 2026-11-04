@@ -28,7 +28,7 @@ armMotor.set_stopping(HOLD)
 
 # AI Vision color descriptions
 camera_BluePipe = Colordesc(1, 11, 54, 134, 10, 0.2)
-camera_RedPipe = Colordesc(3, 185, 20, 11, 10, 0.25)
+camera_RedPipe = Colordesc(3, 151, 6, 3, 10, 0.35)
 
 # Declare sensors
 gyro = Inertial(Ports.PORT11)
@@ -78,7 +78,7 @@ def printFunnyMessage():
     else:
         wordOrder = wordOrderList[int(urandom.random() * 3)]
     
-    brain.screen.print(str(word1) + str(suffix1) + " the " + str(word2) + str(suffix2))
+    brain.screen.print(str(word1) + str(suffix1) + " the " + str(word2) + str(suffix2) + "!")
     print("")
 
 # All setup code goes here
@@ -103,7 +103,7 @@ def initializeRandomSeed():
     )
     seed_val = seed_val**3
     urandom.seed(int(seed_val))
-    temp = pow(urandom.random() + 1, seed_val)
+    temp = pow(urandom.random(), seed_val)
     urandom.seed(int(temp))
     # print("Random seed: "+str(int(temp)))
 
@@ -197,15 +197,14 @@ def pickUpPipe():
 def getPipeAngle():
     global positionList, xPos, yPos, targetDistance, distanceConstant
 
-    canWidthSum = 0
+    canOffsetSum = 0
     for i in range(30):
         camera.take_snapshot(camera_RedPipe)
         obj = camera.largest_object()
-        objWidth = obj.width
-        canWidthSum += objWidth
-    objWidth = canWidthSum / 30
+        hOffset = obj.centerX - 160
+        canOffsetSum += hOffset
+    hOffset = canOffsetSum / 30
 
-    hOffset = obj.centerX - 160
     angle = hOffset * (74 / 320)
     print("hOffset: "+str(hOffset))
     print("angle: "+str(angle))
@@ -216,16 +215,16 @@ def getPipeAngle():
 def getPipeDistance():
     global positionList, xPos, yPos, targetDistance, distanceConstant
 
-    canWidthSum = 0
+    largest = 0
     for i in range(30):
         camera.take_snapshot(camera_RedPipe)
         obj = camera.largest_object()
         objWidth = obj.width
-        canWidthSum += objWidth
-    objWidth = canWidthSum / 30
+        if (objWidth > largest):
+            largest = objWidth
 
-    objDist = (distanceConstant / objWidth)
-    print("objWidth: "+str(objWidth))
+    objDist = (distanceConstant / largest)
+    print("objWidth: "+str(largest))
     print( "Distance: "+str(objDist) )
 
     return objDist
@@ -253,22 +252,24 @@ setup() #ALL SETUP CODE GOES HERE
 moveToPoint([50, 12])
 pickUpPipe()
 
-moveToPoint([40, 12])
+# moveToPoint([40, 12])
 
 moveToPoint([72,120])
 
-moveToPoint([110, 126]) #WIP (may need to move forward)
-turnToPoint([132, 126])
+moveToPoint([120, 126]) #WIP (may need to move forward)
 dropPipe()
 
+##ADD NEGATIVE OFFSET
 
-moveToPoint([58, 132])
-turnToPoint([36, 132])
-pickUpPipe()
+# moveToPoint([58, 132])
+# turnToPoint([36, 132])
+# pickUpPipe()
 
-moveToPoint([110, 126]) #WIP (may need to move forward)
-turnToPoint([110, 126])
-dropPipe()
+# moveToPoint([120, 126]) #WIP (may need to move forward)
+# dropPipe()
+
+
+
 
 
 #.  moveToPoint([, ])
