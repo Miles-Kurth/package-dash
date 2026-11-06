@@ -43,7 +43,7 @@ xPos = 8
 yPos = 6
 targetDistance = 0
 
-distanceConstant = 375
+distanceConstant = 346
 
 positionList = [] #list of all points the robot has traveled to
 
@@ -57,8 +57,8 @@ def printFunnyMessage():
     determinerList = ["the", "a", "this", "that"]
     wordOrderList = ["1D2", "D12", "12D"]
 
-    word1 = wordList[int(urandom.random() * 2)]
-    word2 = wordList[int(urandom.random() * 2)].lower()
+    word1 = wordList[int(urandom.random() * 3.0)]
+    word2 = wordList[int(urandom.random() * 3.0)].lower()
 
     if (word1 == "Dash"): #prevent "dashage" in word 1
         suffix1 = suffixList[int(urandom.random() * 2) + 1]
@@ -191,7 +191,7 @@ def pickUpPipe():
     global positionList, xPos, yPos, targetDistance, distanceConstant
 
     driveTrain.turn_to_heading(gyro.heading() + getPipeAngle()*0.7)
-    driveTrain.drive_for(FORWARD, getPipeDistance() - 1, INCHES)
+    driveTrain.drive_for(FORWARD, getPipeDistance(), INCHES)
     addMoveToList( getCoordsFromHeading(gyro.heading(), getPipeDistance() - 1) )
     updatePosition()
 
@@ -236,8 +236,11 @@ def getPipeDistance():
 
 # Drops the pipe in place and returns arm to neutral position
 def dropPipe():
-    clawMotor.spin_for(FORWARD, 1, SECONDS)
     armMotor.spin_for(REVERSE, 40, DEGREES)
+    armMotor.spin_for(REVERSE, 200, DEGREES)
+    clawMotor.spin_for(FORWARD, 1, SECONDS)
+    armMotor.spin_for(FORWARD, 200, DEGREES)
+
     
 
 #//--------------->>/ MILES COORDINATE END /<<---------------//
@@ -254,25 +257,25 @@ setup() #ALL SETUP CODE GOES HERE
 
 
 
-moveToPoint([50, 12])
+moveToPoint([40, 10])
 pickUpPipe()
 
 # moveToPoint([40, 12])
 
 moveToPoint([72,120])
 
-moveToPoint([120, 126]) #WIP (may need to move forward)
+moveToPoint([120, 120]) #WIP (may need to move forward)
 dropPipe()
 
 ##ADD VERTICAL OFFSET (positve y)
-addMoveToList([120, 132]) #measure this
+addMoveToList([120, 138]) #measure this
 
-# moveToPoint([58, 132])
-# turnToPoint([36, 132])
-# pickUpPipe()
+moveToPoint([58, 132])
+turnToPoint([36, 132])
+pickUpPipe()
 
-# moveToPoint([120, 126]) #WIP (may need to move forward)
-# dropPipe()
+moveToPoint([120, 126]) #WIP (may need to move forward)
+dropPipe()
 
 
 
@@ -283,3 +286,4 @@ addMoveToList([120, 132]) #measure this
 print("END OF CODE")
 time.sleep(5)
 print("PROGRAM ENDING")
+exit()
