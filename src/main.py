@@ -8,7 +8,6 @@
 # ---------------------------------------------------------------------------- #
 
 # Library imports
-import random
 
 import urandom
 from vex import *
@@ -66,7 +65,7 @@ def printFunnyMessage():
     else:
         suffix1 = suffixList[int(urandom.random() * 3)]
     
-    if (word2.lower() == "dash"): #prevent "dashage" in word 2
+    if (word2 == "dash"): #prevent "dashage" in word 2
         suffix2 = suffixList[int(urandom.random() * 2) + 1]
     else:
         suffix2 = suffixList[int(urandom.random() * 3)]
