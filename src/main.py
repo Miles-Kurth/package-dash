@@ -264,7 +264,8 @@ moveToPoint([72,120])
 moveToPoint([120, 126]) #WIP (may need to move forward)
 dropPipe()
 
-##ADD NEGATIVE OFFSET
+##ADD VERTICAL OFFSET (positve y)
+addMoveToList([120, 132]) #measure this
 
 # moveToPoint([58, 132])
 # turnToPoint([36, 132])
