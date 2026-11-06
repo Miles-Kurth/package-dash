@@ -77,8 +77,14 @@ def printFunnyMessage():
         wordOrder = wordOrderList[int(urandom.random() * 2)]
     else:
         wordOrder = wordOrderList[int(urandom.random() * 3)]
+
+    if (wordOrder == "1D2"):
+        brain.screen.print(word1 + suffix1 + " " + det + " " + word2 + suffix2 + "!")
+    else if (wordOrder == "D12"):
+        brain.screen.print(det + " " + word1 + suffix1 + " " + word2 + suffix2 + "!")
+    else if (wordOrder == "12D"):
+        brain.screen.print(word1 + suffix1 + " " + word2 + suffix2 + " " + det + "!")
     
-    brain.screen.print(str(word1) + str(suffix1) + " the " + str(word2) + str(suffix2) + "!")
     print("")
 
 # All setup code goes here
@@ -103,8 +109,8 @@ def initializeRandomSeed():
     )
     seed_val = seed_val**3
     urandom.seed(int(seed_val))
-    temp = pow(urandom.random(), seed_val)
-    urandom.seed(int(temp))
+    # temp = pow(urandom.random(), seed_val)
+    # urandom.seed(int(temp))
     # print("Random seed: "+str(int(temp)))
 
 # Picks randomly either 1 or -1
