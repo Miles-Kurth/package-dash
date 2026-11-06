@@ -66,7 +66,7 @@ def printFunnyMessage():
     else:
         suffix1 = suffixList[int(urandom.random() * 3)]
     
-    if (word2 == "Dash"): #prevent "dashage" in word 2
+    if (word2.lower() == "dash"): #prevent "dashage" in word 2
         suffix2 = suffixList[int(urandom.random() * 2) + 1]
     else:
         suffix2 = suffixList[int(urandom.random() * 3)]
@@ -74,15 +74,15 @@ def printFunnyMessage():
     det = determinerList[int(urandom.random() * 4)]
 
     if (det == "this" or det == "that"): #only allow pattern 3 if det is this or that
-        wordOrder = wordOrderList[int(urandom.random() * 2)]
-    else:
         wordOrder = wordOrderList[int(urandom.random() * 3)]
+    else:
+        wordOrder = wordOrderList[int(urandom.random() * 2)]
 
     if (wordOrder == "1D2"):
         brain.screen.print(word1 + suffix1 + " " + det + " " + word2 + suffix2 + "!")
-    else if (wordOrder == "D12"):
+    elif (wordOrder == "D12"):
         brain.screen.print(det + " " + word1 + suffix1 + " " + word2 + suffix2 + "!")
-    else if (wordOrder == "12D"):
+    elif (wordOrder == "12D"):
         brain.screen.print(word1 + suffix1 + " " + word2 + suffix2 + " " + det + "!")
     
     print("")
