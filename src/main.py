@@ -27,7 +27,7 @@ armMotor.set_stopping(HOLD)
 
 # AI Vision color descriptions
 camera_BluePipe = Colordesc(1, 11, 54, 134, 10, 0.2)
-camera_RedPipe = Colordesc(3, 151, 6, 3, 10, 0.35)
+camera_RedPipe = Colordesc(3, 151, 6, 3, 10, 0.45)
 
 # Declare sensors
 gyro = Inertial(Ports.PORT11)
@@ -43,7 +43,7 @@ xPos = 8
 yPos = 6
 targetDistance = 0
 
-distanceConstant = 346
+distanceConstant = 360 #346
 
 positionList = [] #list of all points the robot has traveled to
 
@@ -79,10 +79,13 @@ def printFunnyMessage():
 
     if (wordOrder == "1D2"):
         brain.screen.print(word1 + suffix1 + " " + det + " " + word2 + suffix2 + "!")
+        print(word1 + suffix1 + " " + det + " " + word2 + suffix2 + "!")
     elif (wordOrder == "D12"):
         brain.screen.print(det + " " + word1 + suffix1 + " " + word2 + suffix2 + "!")
+        print(det + " " + word1 + suffix1 + " " + word2 + suffix2 + "!")
     elif (wordOrder == "12D"):
         brain.screen.print(word1 + suffix1 + " " + word2 + suffix2 + " " + det + "!")
+        print(word1 + suffix1 + " " + word2 + suffix2 + " " + det + "!")
     
     print("")
 
@@ -190,9 +193,18 @@ def getCoordsFromHeading(heading, distance):
 def pickUpPipe():
     global positionList, xPos, yPos, targetDistance, distanceConstant
 
+    print("first check")
     driveTrain.turn_to_heading(gyro.heading() + getPipeAngle()*0.7)
-    driveTrain.drive_for(FORWARD, getPipeDistance(), INCHES)
-    addMoveToList( getCoordsFromHeading(gyro.heading(), getPipeDistance() - 1) )
+    pipeDist = getPipeDistance()
+    driveTrain.drive_for(FORWARD, pipeDist / 2 - 1, INCHES)
+    addMoveToList( getCoordsFromHeading(gyro.heading(), pipeDist / 2 - 1) )
+    print("second check")
+    driveTrain.turn_to_heading(gyro.heading() + getPipeAngle()*0.7)
+    pipeDist = getPipeDistance()
+    driveTrain.drive_for(FORWARD, pipeDist - 1, INCHES)
+    addMoveToList( getCoordsFromHeading(gyro.heading(), pipeDist - 1) )
+
+
     updatePosition()
 
     clawMotor.spin_for(REVERSE, 1, SECONDS)
@@ -203,12 +215,13 @@ def getPipeAngle():
     global positionList, xPos, yPos, targetDistance, distanceConstant
 
     canOffsetSum = 0
-    for i in range(30):
+    for i in range(100):
         camera.take_snapshot(camera_RedPipe)
         obj = camera.largest_object()
         hOffset = obj.centerX - 160
         canOffsetSum += hOffset
-    hOffset = canOffsetSum / 30
+        wait(10)
+    hOffset = canOffsetSum / 100
 
     angle = hOffset * (74 / 320)
     print("hOffset: "+str(hOffset))
@@ -221,12 +234,13 @@ def getPipeDistance():
     global positionList, xPos, yPos, targetDistance, distanceConstant
 
     largest = 0
-    for i in range(30):
+    for i in range(100):
         camera.take_snapshot(camera_RedPipe)
         obj = camera.largest_object()
         objWidth = obj.width
         if (objWidth > largest):
             largest = objWidth
+        wait(10)
 
     objDist = (distanceConstant / largest)
     print("objWidth: "+str(largest))
@@ -241,7 +255,12 @@ def dropPipe():
     clawMotor.spin_for(FORWARD, 1, SECONDS)
     armMotor.spin_for(FORWARD, 200, DEGREES)
 
-    
+# Drives forward or backward a certain distance
+def moveDistance(distance):
+    global positionList, xPos, yPos
+    driveTrain.drive_for(FORWARD, distance, INCHES)
+    addMoveToList( getCoordsFromHeading(gyro.heading(), distance) )
+    updatePosition()
 
 #//--------------->>/ MILES COORDINATE END /<<---------------//
 
@@ -257,33 +276,41 @@ setup() #ALL SETUP CODE GOES HERE
 
 
 
-moveToPoint([40, 10])
+moveToPoint([50, 10])
 pickUpPipe()
+moveDistance(-15)
+
 
 # moveToPoint([40, 12])
 
 moveToPoint([72,120])
 
-moveToPoint([120, 120]) #WIP (may need to move forward)
+moveToPoint([120, 120])
 dropPipe()
 
 ##ADD VERTICAL OFFSET (positve y)
-addMoveToList([120, 138]) #measure this
+addMoveToList([126, 114]) #measure this
 
-moveToPoint([58, 132])
+moveToPoint([58, 128])
 turnToPoint([36, 132])
 pickUpPipe()
+moveDistance(-15)
 
-moveToPoint([120, 126]) #WIP (may need to move forward)
+
+moveToPoint([120, 126])
 dropPipe()
 
+moveToPoint([102, 94])
+turnToPoint([96, 72])
+pickUpPipe()
+moveDistance(-15)
 
-
-
+moveToPoint([120, 108])
+dropPipe()
 
 #.  moveToPoint([, ])
 
 print("END OF CODE")
 time.sleep(5)
 print("PROGRAM ENDING")
-exit()
+sys.exit()
