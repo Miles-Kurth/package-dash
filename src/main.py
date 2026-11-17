@@ -54,37 +54,43 @@ positionList = [] #list of all points the robot has traveled to
 def printFunnyMessage():
     wordList = ["Dash", "Pack"]
     suffixList = ["age", "ing", ""]
-    determinerList = ["the", "a", "this", "that"]
+    determinerList = ["The", "A", "This", "That"]
     wordOrderList = ["1D2", "D12", "12D"]
 
-    word1 = wordList[int(urandom.random() * 3.0)]
-    word2 = wordList[int(urandom.random() * 3.0)].lower()
+    word1 = wordList[int(urandom.random() * 2.0)]
+    word2 = wordList[int(urandom.random() * 2.0)]
 
     if (word1 == "Dash"): #prevent "dashage" in word 1
         suffix1 = suffixList[int(urandom.random() * 2) + 1]
     else:
         suffix1 = suffixList[int(urandom.random() * 3)]
     
-    if (word2 == "dash"): #prevent "dashage" in word 2
+    if (word2 == "Dash"): #prevent "dashage" in word 2
         suffix2 = suffixList[int(urandom.random() * 2) + 1]
     else:
         suffix2 = suffixList[int(urandom.random() * 3)]
 
     det = determinerList[int(urandom.random() * 4)]
 
-    if (det == "this" or det == "that"): #only allow pattern 3 if det is this or that
+    if (det == "This" or det == "That"): #only allow pattern 3 if det is this or that
         wordOrder = wordOrderList[int(urandom.random() * 3)]
     else:
         wordOrder = wordOrderList[int(urandom.random() * 2)]
 
+    if (wordOrder != "D12"): det = det.lower()
+    if (wordOrder == "D12"):
+        word1 = word1.lower()
+        word2 = word2.lower()
     if (wordOrder == "1D2"):
-        brain.screen.print(word1 + suffix1 + " " + det + " " + word2 + suffix2 + "!")
+            word2 = word2.lower()
+    if (wordOrder == "12D"):
+                word2 = word2.lower()
+
+    if (wordOrder == "1D2"):
         print(word1 + suffix1 + " " + det + " " + word2 + suffix2 + "!")
     elif (wordOrder == "D12"):
-        brain.screen.print(det + " " + word1 + suffix1 + " " + word2 + suffix2 + "!")
         print(det + " " + word1 + suffix1 + " " + word2 + suffix2 + "!")
     elif (wordOrder == "12D"):
-        brain.screen.print(word1 + suffix1 + " " + word2 + suffix2 + " " + det + "!")
         print(word1 + suffix1 + " " + word2 + suffix2 + " " + det + "!")
     
     print("")
